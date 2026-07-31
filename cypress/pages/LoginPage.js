@@ -16,10 +16,9 @@ class LoginPage {
   }
 
   login(username, password) {
-    this.visit();
-    this.fillUsername(username);
-    this.fillPassword(password);
-    this.submit();
+    // Reaproveita o comando customizado cy.login (cypress/support/commands.js),
+    // que também limpa cookies/localStorage antes de visitar a página.
+    cy.login(username, password);
   }
 
   getErrorMessage() {

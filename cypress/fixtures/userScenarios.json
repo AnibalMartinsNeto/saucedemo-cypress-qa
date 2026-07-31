@@ -3,36 +3,36 @@
     "key": "standard",
     "username": "standard_user",
     "password": "secret_sauce",
-    "canLogin": true
+    "expectedError": null
   },
   {
     "key": "locked",
     "username": "locked_out_user",
     "password": "secret_sauce",
-    "canLogin": false
+    "expectedError": "Sorry, this user has been locked out"
   },
   {
     "key": "problem",
     "username": "problem_user",
     "password": "secret_sauce",
-    "canLogin": true
+    "expectedError": null
   },
   {
     "key": "performanceGlitch",
     "username": "performance_glitch_user",
     "password": "secret_sauce",
-    "canLogin": true
+    "expectedError": null
   },
   {
     "key": "error",
     "username": "error_user",
     "password": "secret_sauce",
-    "canLogin": true
+    "expectedError": null
   },
   {
     "key": "visual",
     "username": "visual_user",
     "password": "secret_sauce",
-    "canLogin": true
+    "expectedError": null
   }
 ]

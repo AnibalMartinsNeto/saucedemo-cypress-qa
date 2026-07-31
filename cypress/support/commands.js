@@ -1,7 +1,8 @@
 // cypress/support/commands.js
-// Comandos customizados usados na suíte de comportamento por usuário
-// (cypress/e2e/login.cy.js). Centralizar essas verificações aqui evita
-// duplicar lógica nas specs e deixa cada teste declarativo.
+// Comandos customizados usados nas specs, principalmente na suíte de
+// comportamento por usuário (cypress/e2e/user-behavior-matrix.cy.js).
+// Centralizar essas verificações aqui evita duplicar lógica nas specs
+// e deixa cada teste declarativo.
 
 // Grava o resultado de uma verificação em cypress/results/user-behavior-log.json.
 Cypress.Commands.add("logCheck", (entry) => {
@@ -24,20 +25,18 @@ Cypress.Commands.add("login", (username, password) => {
   cy.get("#login-button").click();
 });
 
-// Faz login e mede o tempo até a página de produtos carregar (alias "loginDuration").
+// Faz login e guarda o horário de início (alias "loginStartedAt"), sem
+// presumir se o resultado vai ser sucesso ou bloqueio — quem decide isso
+// é a checagem da mensagem em tela, não esse comando.
 //
 // Não usamos cy.session() aqui: este app só atualiza a URL para
 // /inventory.html via JS depois do login (não existe essa rota no
 // servidor), então revisitar a URL direto — como cy.session() faz para
 // restaurar sessão — resulta em 404.
-Cypress.Commands.add("loginAndMeasure", (username, password) => {
+Cypress.Commands.add("attemptLogin", (username, password) => {
   const start = Date.now();
   cy.login(username, password);
-  cy.url({ timeout: 15000 })
-    .should("include", "/inventory.html")
-    .then(() => {
-      cy.wrap(Date.now() - start, { log: false }).as("loginDuration");
-    });
+  cy.wrap(start, { log: false }).as("loginStartedAt");
 });
 
 // true se houver imagens de produto duplicadas na listagem.

@@ -4,9 +4,10 @@
   "description": "Projeto de automação de testes E2E com Cypress para o SauceDemo (Swag Labs) - Desafio Técnico Analista de QA",
   "scripts": {
     "cy:open": "cypress open",
-    "test": "cypress run",
-    "test:headless": "cypress run --headless",
-    "test:chrome": "cypress run --browser chrome"
+    "test": "cypress run --spec \"cypress/e2e/login.cy.js,cypress/e2e/sorting.cy.js,cypress/e2e/checkout.cy.js\"",
+    "test:chrome": "cypress run --browser chrome --spec \"cypress/e2e/login.cy.js,cypress/e2e/sorting.cy.js,cypress/e2e/checkout.cy.js\"",
+    "test:diagnostics": "cypress run --spec \"cypress/e2e/user-behavior-matrix.cy.js\"",
+    "test:all": "cypress run"
   },
   "devDependencies": {
     "cypress": "^15.19.0"
