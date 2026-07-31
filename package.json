@@ -1,0 +1,14 @@
+{
+  "name": "saucedemo-cypress-qa",
+  "version": "1.0.0",
+  "description": "Projeto de automação de testes E2E com Cypress para o SauceDemo (Swag Labs) - Desafio Técnico Analista de QA",
+  "scripts": {
+    "cy:open": "cypress open",
+    "test": "cypress run",
+    "test:headless": "cypress run --headless",
+    "test:chrome": "cypress run --browser chrome"
+  },
+  "devDependencies": {
+    "cypress": "^15.19.0"
+  }
+}
