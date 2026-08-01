@@ -9,6 +9,10 @@ class InventoryPage {
     cy.get(".shopping_cart_link").click();
   }
 
+  getCartBadgeCount() {
+    return cy.get(".shopping_cart_badge");
+  }
+
   sortBy(optionValue) {
     cy.get(".product_sort_container").select(optionValue);
   }

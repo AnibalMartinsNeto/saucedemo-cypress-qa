@@ -98,7 +98,7 @@ Para quem consegue logar, a suíte segue validando — para todo usuário de tes
 |---|---|
 | `standard_user` | Nenhum |
 | `locked_out_user` | Login bloqueado (comportamento esperado, não é bug) |
-| `problem_user` | 3 produtos com botão "Add to cart" que não responde ao clique |
+| `problem_user` | Imagens de produto duplicadas; 3 produtos com botão "Add to cart" que não responde ao clique |
 | `performance_glitch_user` | Login perceptivelmente mais lento |
 | `error_user` | Mesmos 3 produtos do `problem_user` com botão sem resposta ao clique |
 | `visual_user` | Menu (hamburger) torto e botão "Add to cart" do último produto ultrapassando a borda do card |

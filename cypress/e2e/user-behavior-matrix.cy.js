@@ -11,7 +11,13 @@ import scenarios from "../fixtures/userScenarios.json";
 // Por isso roda separado, via `npm run test:diagnostics`, e não faz parte
 // do `npm test` padrão. Detalhes em README.md.
 
-const PERFORMANCE_THRESHOLD_MS = 2000;
+// O tempo aqui conta desde antes do clique em "Login" até o app confirmar
+// o resultado na tela (form + clique + redirecionamento), então inclui a
+// sobrecarga normal do Cypress rodando headless com gravação de vídeo —
+// por isso o limite não pode ser 2000ms (login normal já beira isso).
+// 4000ms ainda deixa uma margem folgada abaixo do delay proposital do
+// performance_glitch_user (~6s), então continua detectando o caso real.
+const PERFORMANCE_THRESHOLD_MS = 4000;
 
 describe("Comportamento por tipo de usuário (matriz de cenários)", () => {
   scenarios.forEach((scenario) => {
@@ -21,6 +27,19 @@ describe("Comportamento por tipo de usuário (matriz de cenários)", () => {
     describe(`Usuário: ${scenario.username}`, { testIsolation: false }, () => {
       before(() => {
         cy.attemptLogin(scenario.username, scenario.password);
+
+        // A medição de tempo fica aqui, não num "it" separado: alias
+        // criado dentro de um "it" não fica disponível pro "it" seguinte
+        // (mesmo com testIsolation:false) — só os criados em before()
+        // persistem pra suíte inteira. Só medimos quando o login deve
+        // funcionar; se o cenário espera erro, não existe redirecionamento
+        // pra esperar.
+        if (!scenario.expectedError) {
+          cy.url({ timeout: 15000 }).should("include", "/inventory.html");
+          cy.get("@loginStartedAt").then((start) => {
+            cy.wrap(Date.now() - start, { log: false }).as("loginDuration");
+          });
+        }
       });
 
       // Checagem única, igual para qualquer usuário: compara a tela com o
@@ -41,7 +60,7 @@ describe("Comportamento por tipo de usuário (matriz de cenários)", () => {
               });
             });
         } else {
-          cy.url({ timeout: 15000 }).should("include", "/inventory.html");
+          cy.url().should("include", "/inventory.html");
         }
       });
 
@@ -52,8 +71,7 @@ describe("Comportamento por tipo de usuário (matriz de cenários)", () => {
       if (scenario.expectedError) return;
 
       it("tempo de login deve ser compatível com o esperado", () => {
-        cy.get("@loginStartedAt").then((start) => {
-          const duration = Date.now() - start;
+        cy.get("@loginDuration").then((duration) => {
           const isSlow = duration > PERFORMANCE_THRESHOLD_MS;
 
           cy.logCheck({

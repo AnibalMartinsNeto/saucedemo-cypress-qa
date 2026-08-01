@@ -16,6 +16,11 @@ describe("Fluxo de compra completo (E2E)", () => {
   it("deve completar uma compra com sucesso", () => {
     PRODUCTS.forEach((product) => InventoryPage.addProductToCart(product));
 
+    // Confirma que os cliques em "Add to cart" realmente registraram no
+    // app (não só no botão): o badge do carrinho precisa refletir a
+    // quantidade certa antes de seguir pro checkout.
+    InventoryPage.getCartBadgeCount().should("have.text", String(PRODUCTS.length));
+
     InventoryPage.goToCart();
 
     CartPage.getCartItems().should("have.length", PRODUCTS.length);
