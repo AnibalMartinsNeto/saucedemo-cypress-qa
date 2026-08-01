@@ -25,20 +25,26 @@ describe("Comportamento por tipo de usuário (matriz de cenários)", () => {
     // o Cypress não reseta cookies/DOM entre os "it"s seguintes — cada
     // verificação continua de onde a anterior parou, sem logar de novo.
     describe(`Usuário: ${scenario.username}`, { testIsolation: false }, () => {
-      before(() => {
-        cy.attemptLogin(scenario.username, scenario.password);
+      // Guarda a duração do login numa variável comum (closure), não num
+      // alias do Cypress: na prática, alias criado com .as() não fica
+      // disponível de forma confiável de um "it" para outro, mesmo com
+      // testIsolation:false (só o estado da página persiste). Uma
+      // variável JS normal funciona porque o describe roda uma vez só e
+      // o before()/it()s abaixo compartilham esse mesmo escopo.
+      let loginDurationMs;
 
-        // A medição de tempo fica aqui, não num "it" separado: alias
-        // criado dentro de um "it" não fica disponível pro "it" seguinte
-        // (mesmo com testIsolation:false) — só os criados em before()
-        // persistem pra suíte inteira. Só medimos quando o login deve
-        // funcionar; se o cenário espera erro, não existe redirecionamento
-        // pra esperar.
+      before(() => {
+        const loginStartedAt = Date.now();
+        cy.login(scenario.username, scenario.password);
+
+        // Só medimos quando o login deve funcionar; se o cenário espera
+        // erro, não existe redirecionamento pra esperar.
         if (!scenario.expectedError) {
-          cy.url({ timeout: 15000 }).should("include", "/inventory.html");
-          cy.get("@loginStartedAt").then((start) => {
-            cy.wrap(Date.now() - start, { log: false }).as("loginDuration");
-          });
+          cy.url({ timeout: 15000 })
+            .should("include", "/inventory.html")
+            .then(() => {
+              loginDurationMs = Date.now() - loginStartedAt;
+            });
         }
       });
 
@@ -71,22 +77,20 @@ describe("Comportamento por tipo de usuário (matriz de cenários)", () => {
       if (scenario.expectedError) return;
 
       it("tempo de login deve ser compatível com o esperado", () => {
-        cy.get("@loginDuration").then((duration) => {
-          const isSlow = duration > PERFORMANCE_THRESHOLD_MS;
+        const isSlow = loginDurationMs > PERFORMANCE_THRESHOLD_MS;
 
-          cy.logCheck({
-            user: scenario.username,
-            check: "loginPerformance",
-            actual: isSlow,
-            passed: !isSlow,
-            extra: { durationMs: duration, thresholdMs: PERFORMANCE_THRESHOLD_MS },
-          });
-
-          expect(
-            isSlow,
-            `login demorou ${duration}ms (limite: ${PERFORMANCE_THRESHOLD_MS}ms)`
-          ).to.eq(false);
+        cy.logCheck({
+          user: scenario.username,
+          check: "loginPerformance",
+          actual: isSlow,
+          passed: !isSlow,
+          extra: { durationMs: loginDurationMs, thresholdMs: PERFORMANCE_THRESHOLD_MS },
         });
+
+        expect(
+          isSlow,
+          `login demorou ${loginDurationMs}ms (limite: ${PERFORMANCE_THRESHOLD_MS}ms)`
+        ).to.eq(false);
       });
 
       it("imagens de produto não devem estar duplicadas", () => {

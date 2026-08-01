@@ -25,20 +25,6 @@ Cypress.Commands.add("login", (username, password) => {
   cy.get("#login-button").click();
 });
 
-// Faz login e guarda o horário de início (alias "loginStartedAt"), sem
-// presumir se o resultado vai ser sucesso ou bloqueio — quem decide isso
-// é a checagem da mensagem em tela, não esse comando.
-//
-// Não usamos cy.session() aqui: este app só atualiza a URL para
-// /inventory.html via JS depois do login (não existe essa rota no
-// servidor), então revisitar a URL direto — como cy.session() faz para
-// restaurar sessão — resulta em 404.
-Cypress.Commands.add("attemptLogin", (username, password) => {
-  const start = Date.now();
-  cy.login(username, password);
-  cy.wrap(start, { log: false }).as("loginStartedAt");
-});
-
 // true se houver imagens de produto duplicadas na listagem.
 Cypress.Commands.add("hasDuplicateProductImages", () => {
   return cy.get(".inventory_item_img img").then(($imgs) => {
